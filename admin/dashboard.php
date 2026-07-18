@@ -1,8 +1,19 @@
 <?php
 require_once __DIR__ . '/../middleware/auth.php';
+require_once __DIR__ . '/../config/database.php';
 
 AuthMiddleware();
 $active = 'dashboard';
+$stats = $pdo->query(
+    'SELECT (SELECT COUNT(*) FROM products) AS products, ' .
+    '(SELECT COUNT(*) FROM categories) AS categories, ' .
+    '(SELECT COUNT(*) FROM users) AS users'
+)->fetch();
+$recentProducts = $pdo->query(
+    'SELECT p.name, p.price, p.status, c.name AS category_name ' .
+    'FROM products p LEFT JOIN categories c ON c.id = p.category_id ' .
+    'ORDER BY p.id DESC LIMIT 5'
+)->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -33,28 +44,28 @@ $active = 'dashboard';
                 <div class="stat-icon icon-indigo"><i class="bi bi-box-seam-fill"></i></div>
                 <div class="stat-info">
                     <span class="stat-label">Total Products</span>
-                    <span class="stat-value">128</span>
+                    <span class="stat-value"><?= (int) $stats['products'] ?></span>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon icon-amber"><i class="bi bi-tags-fill"></i></div>
                 <div class="stat-info">
                     <span class="stat-label">Categories</span>
-                    <span class="stat-value">14</span>
+                    <span class="stat-value"><?= (int) $stats['categories'] ?></span>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon icon-green"><i class="bi bi-people-fill"></i></div>
                 <div class="stat-info">
                     <span class="stat-label">Registered Users</span>
-                    <span class="stat-value">342</span>
+                    <span class="stat-value"><?= (int) $stats['users'] ?></span>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon icon-rose"><i class="bi bi-graph-up-arrow"></i></div>
                 <div class="stat-info">
-                    <span class="stat-label">This Month's Growth</span>
-                    <span class="stat-value">+8.2%</span>
+                    <span class="stat-label">Active Products</span>
+                    <span class="stat-value"><?= (int) $pdo->query("SELECT COUNT(*) FROM products WHERE status = 'active'")->fetchColumn() ?></span>
                 </div>
             </div>
         </section>
@@ -76,24 +87,18 @@ $active = 'dashboard';
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>Wireless Mouse</td>
-                                <td>Electronics</td>
-                                <td>$24.00</td>
-                                <td><span class="badge-status badge-active">Active</span></td>
-                            </tr>
-                            <tr>
-                                <td>Canvas Backpack</td>
-                                <td>Bags</td>
-                                <td>$59.00</td>
-                                <td><span class="badge-status badge-active">Active</span></td>
-                            </tr>
-                            <tr>
-                                <td>Desk Lamp</td>
-                                <td>Home &amp; Office</td>
-                                <td>$32.50</td>
-                                <td><span class="badge-status badge-draft">Draft</span></td>
-                            </tr>
+                            <?php if (!$recentProducts): ?>
+                                <tr><td colspan="4" class="text-center text-muted py-4">No products yet.</td></tr>
+                            <?php else: ?>
+                                <?php foreach ($recentProducts as $product): ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars($product['name']) ?></td>
+                                        <td><?= htmlspecialchars($product['category_name'] ?? '-') ?></td>
+                                        <td>$<?= number_format((float) $product['price'], 2) ?></td>
+                                        <td><span class="badge-status <?= $product['status'] === 'draft' ? 'badge-draft' : 'badge-active' ?>"><?= htmlspecialchars(ucfirst($product['status'])) ?></span></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>

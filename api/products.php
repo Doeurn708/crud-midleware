@@ -3,6 +3,7 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../middleware/auth.php';
 
 header('Content-Type: application/json; charset=utf-8');
+requireAdminAjax();
 
 function productImagePath(?string $image): ?string
 {
@@ -56,7 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     exit;
 }
 
-requireAuthAjax();
 $action = $_POST['action'] ?? '';
 $id = (int) ($_POST['id'] ?? 0);
 

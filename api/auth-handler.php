@@ -25,6 +25,7 @@
         $user = $stmt->fetch();
 
         if($user && password_verify($password ,$user['password'])){
+            session_regenerate_id(true);
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['name'];
             $_SESSION['user_role'] = $user['role'];
@@ -77,5 +78,9 @@
         $_SESSION= [];
         session_destroy();
         echo json_encode(["success" => true , "message" => "User Logged out success"]);
+        exit();
     }
-?>    
+
+    http_response_code(400);
+    echo json_encode(["success" => false, "message" => "Unknown action."]);
+?>

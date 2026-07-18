@@ -3,6 +3,7 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../middleware/auth.php';
 
 header('Content-Type: application/json; charset=utf-8');
+requireAdminAjax();
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $statement = $pdo->query(
@@ -16,7 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     exit;
 }
 
-requireAuthAjax();
 $action = $_POST['action'] ?? '';
 $id = (int) ($_POST['id'] ?? 0);
 $name = trim($_POST['name'] ?? '');
