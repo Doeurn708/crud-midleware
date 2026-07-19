@@ -35,7 +35,7 @@ $active = 'category';
                 <h2>All Categories</h2>
                 <div class="search-box">
                     <i class="bi bi-search"></i>
-                    <input type="text" id="searchInput" placeholder="Search categories...">
+                    <input type="text" class="" id="searchInput" placeholder="Search categories...">
                 </div>
             </div>
 

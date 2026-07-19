@@ -323,8 +323,17 @@ body {
     border: none;
     background: transparent;
     outline: none;
+    box-shadow: none;
     font-size: 0.85rem;
     width: 180px;
+}
+
+/* The search-box container shows the focus border, not the input itself. */
+.search-box input:focus,
+.search-box input:focus-visible {
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
 }
 
 /* Product thumbnail */
